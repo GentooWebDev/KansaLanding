@@ -1,0 +1,30 @@
+* {
+  box-sizing: border-box;
+  font-family: Assistant, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+span[role=heading] {
+  text-align: center;
+  font-weight: 700;
+  font-size: x-large;
+}
+
+img {
+  border-radius: var(--corner-radius);
+}
