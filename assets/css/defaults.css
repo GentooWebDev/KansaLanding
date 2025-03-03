@@ -1,6 +1,5 @@
 * {
-  box-sizing: border-box;
-  font-family: Assistant, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box
 }
 
 html,
@@ -9,6 +8,7 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
+  font-family: Assistant, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 a {

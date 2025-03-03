@@ -1,0 +1,15 @@
+{
+  "imports": {
+    "fs": "jsr:@std/fs@^1.0.13",
+    "path": "jsr:@std/path@^1.0.8",
+    "vento": "jsr:@vento/vento@^1.12.15"
+  },
+  "compilerOptions": {
+    "lib": [
+      "deno.window"
+    ],
+    "types": [
+      "./lib.custom.d.ts"
+    ]
+  }
+}

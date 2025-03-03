@@ -8,6 +8,15 @@
 		"ghcr.io/devcontainers-extra/features/deno:1": {
 			"version": "latest"
 		}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"oscarotero.vento-syntax",
+				"denoland.vscode-deno",
+				"yandeu.five-server"
+			]
+		}
 	}
 
 	// Features to add to the dev container. More info: https://containers.dev/features.

@@ -18,21 +18,27 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Build static files
-        id: build
-        run: ls -al && mkdir ./serve/ && echo "Test 1" > ./serve/index.html
-        
-      - name: Upload static files as artifact
-        id: deployment
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Build site with Deno script
+        run: deno run --allow-read=. --allow-write=./serve ./.buildscripts/build.ts .
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./serve/
-  
+          path: serve/
+
+  # Deployment job
   deploy:
-    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
     needs: build
     steps:
       - name: Deploy to GitHub Pages

@@ -9,7 +9,7 @@
     flex-direction: column;
     gap: var(--spacing) 0;
     align-items: center;
-    
+
     > * {
       max-width: min(100%, 20em);
     }
@@ -35,7 +35,7 @@
       text-align: center;
     }
 
-    > img + span[role=heading] + p + a {
+    > img + span[role=heading] + div + a {
       text-align: center;
       margin: auto;
     }
@@ -48,14 +48,18 @@
   gap: 0 var(--spacing);
 
   > img {
-    width: 100%;
+    width: 80%;
     height: auto;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    justify-self: center;
+    align-self: center;
   }
 
   > div {
     align-self: center;
   }
-  
+
   &.left {
     grid-template-columns: 1fr 1fr;
 

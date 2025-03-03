@@ -1,0 +1,14 @@
+<nav>
+  <ul>
+    {{ for key, linkTo of nav }}
+      {{> const resolvedPage = typeof linkTo === 'string' ? pages.find(page => page.title === linkTo) : null }}
+      {{> const href = resolvedPage === null ? linkTo.href : resolvedPage.href }}
+      {{> const title = resolvedPage === null ? key : resolvedPage.title }}
+      {{> const isCurrentPage = resolvedPage !== null && resolvedPage === currentPage }}
+
+      <li>
+        <a href="{{ isCurrentPage ? '#' : href }}" {{ isCurrentPage ? 'class="current"' : '' }}>{{ title }}</a>
+      </li>
+    {{ /for }}
+  </ul>
+</nav>

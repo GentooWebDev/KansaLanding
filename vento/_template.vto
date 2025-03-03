@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Assistant:wght@200..800&display=swap"
+      rel="stylesheet"
+    >
+    <link rel="stylesheet" href="/assets/css/main.css">
+    {{ if currentPage.css }}
+      <link rel="stylesheet" href="/assets/css/{{ currentPage.css }}.css">
+    {{ /if }}
+    <title>Kansa | {{ currentPage.title }}</title>
+  </head>
+  <body>
+    <header>
+      <img src="/assets/img/logo.png" alt="Kansa Logo">
+      {{ include "_nav.vto" { nav: navData.top } }}
+    </header>
+    <main>
+      {{ content }}
+    </main>
+    <footer>
+      {{ include "_nav.vto" { nav: navData.bottom } }}
+
+      <details>
+        <summary>Disclaimer</summary>
+        <p>
+          We hope you will enjoy visiting our site. We try to keep it accurate
+          and up to date but we cannot guarantee that is the case.
+        </p>
+        <p>Please note the following:-</p>
+        <ul>
+          <li>
+            All colour illustrations of glass on this site are for reference
+            purposes only. Due to variations in screen technology and personal
+            display settings, the colours seen on your display may differ
+            significantly from the actual colour of the delivered product.
+          </li>
+          <li>
+            Art glass is, by its nature, variable in colour and pattern. Even
+            sample sets and sample pieces cannot be a guarantee of an exact
+            match in any delivered piece. Pictures of products shown on this web
+            site are for illustrative purposes only and the goods supplied may
+            differ slightly from those shown.
+          </li>
+          <li>
+            All content is provided on an “as is” basis and Kansacraft disclaims
+            all warranties, express or implied, in respect of the site, and will
+            not be held liable for any loss or damage arising from its use.
+          </li>
+          <li>
+            We cannot guarantee that the site and its host server are free of
+            computer malware and recommend that you take appropriate safeguards
+            prior to making any downloads to your computer.
+          </li>
+        </ul>
+      </details>
+    </footer>
+  </body>
+</html>
