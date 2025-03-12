@@ -4,7 +4,7 @@ import vento from "vento";
 import { extractBaseName, getPageData, navData } from "./pages.ts";
 
 console.debug("Started - not yet validated environment.");
-console.debug("Args:", Deno.args);
+console.debug("Unparsed Args:", Deno.args);
 
 const [flags, args] = Deno.args.reduce((acc, arg) => {
   if (arg.startsWith("--")) {
@@ -16,8 +16,8 @@ const [flags, args] = Deno.args.reduce((acc, arg) => {
   return acc;
 }, [Array<string>(), Array<string>()]);
 
-console.debug("Parsed Flags:", flags);
 console.debug("Parsed Args:", args);
+console.debug("Parsed Flags:", flags);
 
 // Check if we have a path supplied
 if (args.length !== 1) {
@@ -37,7 +37,7 @@ if (cautious) {
   );
 }
 
-console.debug("Args valid. Resolving path.");
+console.debug("Args valid. Resolving path...");
 
 // Resolve the provided path against the current working directory.
 // If an absolute path is provided, that will be used. If a relative
@@ -53,7 +53,7 @@ if (!existsSync(PATH, { isDirectory: true })) {
 }
 
 console.debug(
-  "`PATH` exists! Creating required directory structure in memory.",
+  "Path exists! Creating required directory structure in memory.",
 );
 
 const REQUIRED_DIRECTORIES = Object.fromEntries(([
