@@ -30,6 +30,10 @@ const pages = [
     filepath: "index.vto",
   },
   {
+    title: "About",
+    filepath: "about.vto",
+  },
+  {
     title: "Contact",
     filepath: "contact.vto",
   },
@@ -47,7 +51,7 @@ export const navData: { top: NavBar; bottom: NavBar } = {
   top: {
     "Home": "Home",
     "Contact": "Contact",
-    "About Us": { href: "/#about" },
+    "About Us": "About",
   },
   bottom: {
     "Refunds Policy": "Refunds Policy",
