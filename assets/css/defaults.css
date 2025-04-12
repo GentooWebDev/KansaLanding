@@ -27,4 +27,6 @@ span[role="heading"] {
 
 img {
   border-radius: var(--corner-radius);
+  width: 100%;
+  height: auto;
 }

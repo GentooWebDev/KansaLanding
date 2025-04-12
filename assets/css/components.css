@@ -111,3 +111,15 @@
     }
   }
 }
+
+.two-images {
+  display: flex;
+  height: auto;
+
+  > img {
+    flex-shrink: 0;
+    height: 100px;
+    width: auto;
+    margin-right: 10px;
+  }
+}

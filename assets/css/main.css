@@ -60,6 +60,10 @@
     border-bottom: 1px solid var(--accent-colour);
     margin-bottom: var(--spacing);
 
+    > img {
+      width: min(13rem, 45vw);
+    }
+
     > nav > ul {
       display: flex;
       justify-content: space-around;
