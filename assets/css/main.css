@@ -1,8 +1,8 @@
 @layer defaults, components, site, utilities, overrides;
-@import url('defaults.css') layer(defaults);
-@import url('components.css') layer(components);
-@import url('utilities.css') layer(utilities);
-@import url('overrides.css') layer(overrides);
+@import url("defaults.css") layer(defaults);
+@import url("components.css") layer(components);
+@import url("utilities.css") layer(utilities);
+@import url("overrides.css") layer(overrides);
 
 :root {
   --accent-colour: hsl(0, 0%, 90%);

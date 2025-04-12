@@ -4,36 +4,38 @@
   grid-template-rows: 1fr min-content min-content min-content;
   gap: 0 var(--spacing);
   @media (max-width: 480px) {
-      display: flex;
-      flex-direction: column; gap: var(--spacing) 0; align-items: center;
-      > * {
-          max-width: min(100%, 20em);
-      }
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing) 0;
+    align-items: center;
+    > * {
+      max-width: min(100%, 20em);
+    }
   }
 
   > .card {
-      background-color: var(--accent-colour);
-      border-radius: var(--corner-radius);
-      grid-row: 1 / span 4;
-      display: grid;
-      grid-template-rows: subgrid;
-      padding: var(--spacing);
-      > img {
-          width: 40%;
-          height: auto;
-          object-fit: cover;
-          clip-path: circle();
-          margin: auto;
-      }
+    background-color: var(--accent-colour);
+    border-radius: var(--corner-radius);
+    grid-row: 1 / span 4;
+    display: grid;
+    grid-template-rows: subgrid;
+    padding: var(--spacing);
+    > img {
+      width: 40%;
+      height: auto;
+      object-fit: cover;
+      clip-path: circle();
+      margin: auto;
+    }
 
-      > img + span[role=heading] {
-          text-align: center;
-      }
+    > img + span[role="heading"] {
+      text-align: center;
+    }
 
-      > img + span[role=heading] + div + a {
-          text-align: center;
-          margin: auto;
-      }
+    > img + span[role="heading"] + div + a {
+      text-align: center;
+      margin: auto;
+    }
   }
 }
 
@@ -42,70 +44,70 @@
   grid-template-areas: "left right";
   gap: 0 var(--spacing);
   > img {
-      width: 80%;
-      height: auto;
-      margin-top: 1rem;
-      margin-bottom: 1rem;
-      justify-self: center;
-      align-self: center;
+    width: 80%;
+    height: auto;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    justify-self: center;
+    align-self: center;
   }
 
   &.with-img-bg {
-      > img {
-          height: 100%;
-          width: 80%;
-          object-fit: cover;
-          &:not(:first-of-type) {
-              filter: brightness(0.7);
-          }
+    > img {
+      height: 100%;
+      width: 80%;
+      object-fit: cover;
+      &:not(:first-of-type) {
+        filter: brightness(0.7);
       }
+    }
 
-      > div {
-          height: 100%;
-          width: 80%;
-          align-content: end;
-          justify-self: center;
-          color: white;
-          z-index: 1;
-          padding: 0 1rem;
-      }
+    > div {
+      height: 100%;
+      width: 80%;
+      align-content: end;
+      justify-self: center;
+      color: white;
+      z-index: 1;
+      padding: 0 1rem;
+    }
   }
 
   > div {
-      align-self: center;
+    align-self: center;
   }
 
   &.left {
-      grid-template-columns: 1fr 1fr;
-      > img {
-          grid-area: left;
-      }
+    grid-template-columns: 1fr 1fr;
+    > img {
+      grid-area: left;
+    }
 
-      &.with-img-bg {
-          > img:not(:first-of-type) {
-              grid-area: right;
-          }
+    &.with-img-bg {
+      > img:not(:first-of-type) {
+        grid-area: right;
       }
+    }
 
-      > div {
-          grid-area: right;
-      }
+    > div {
+      grid-area: right;
+    }
   }
 
   &.right {
-      grid-template-columns: 1fr 1fr;
-      > img {
-          grid-area: right;
-      }
+    grid-template-columns: 1fr 1fr;
+    > img {
+      grid-area: right;
+    }
 
-      &.with-img-bg {
-          > img:not(:first-of-type) {
-              grid-area: left;
-          }
+    &.with-img-bg {
+      > img:not(:first-of-type) {
+        grid-area: left;
       }
+    }
 
-      > div {
-          grid-area: left;
-      }
+    > div {
+      grid-area: left;
+    }
   }
 }
