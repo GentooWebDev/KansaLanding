@@ -8,7 +8,10 @@
   --accent-colour: hsl(0, 0%, 90%);
   --inactive-top-link-colour: hsl(0, 0%, 50%);
   --separator-colour: hsl(0, 0%, 65%);
+  --img-overlay-colour: hsl(280 100% 5%);
+  --img-overlay-opacity: 60%;
   --active-top-link-colour: black;
+  --button-colour: hsl(281, 100%, 15%);
   --footer-colour: lightgray;
   --corner-radius: 6px;
   --spacing: 1rem;
@@ -78,10 +81,6 @@
     width: 100%;
     height: 100%;
     margin: auto;
-
-    > section > h1:first-child {
-      margin-left: -1rem;
-    }
   }
 
   body > footer {

@@ -1,125 +1,110 @@
-.card-row {
+.row {
   display: grid;
   grid-auto-columns: 1fr;
-  grid-template-rows: 1fr min-content min-content min-content;
-  gap: 0 var(--spacing);
+  gap: var(--spacing);
+  margin: var(--spacing);
+  align-items: stretch;
+
   @media (max-width: 480px) {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing) 0;
     align-items: center;
-    > * {
-      max-width: min(100%, 20em);
-    }
   }
 
-  > .card {
-    background-color: var(--accent-colour);
-    border-radius: var(--corner-radius);
-    grid-row: 1 / span 4;
+  > * {
+    grid-row: 1 / span 1;
+  }
+}
+
+#store-chooser {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: 0 1em;
+  grid-template-areas: "lighting glass";
+  width: 150%;
+  margin-left: -25%;
+
+  > div {
     display: grid;
-    grid-template-rows: subgrid;
-    padding: var(--spacing);
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+
+    &.lighting {
+      grid-area: lighting;
+      grid-template-areas:
+        ". . . ."
+        ". . . ."
+        ". box box box"
+        ". box box box";
+
+      > .box {
+        align-items: flex-end;
+        text-align: right;
+      }
+    }
+
+    &.glass {
+      grid-area: glass;
+      grid-template-areas:
+        ". . . ."
+        ". . . ."
+        "box box box ."
+        "box box box .";
+
+      > .box {
+        align-items: flex-start;
+        text-align: left;
+      }
+    }
+
     > img {
-      width: 40%;
-      height: auto;
-      object-fit: cover;
-      clip-path: circle();
-      margin: auto;
+      grid-row: 1 / span 4;
+      grid-column: 1 / span 4;
     }
 
-    > img + span[role="heading"] {
-      text-align: center;
-    }
+    > .box {
+      grid-area: box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
 
-    > img + span[role="heading"] + div + a {
-      text-align: center;
-      margin: auto;
+      > a:last-child {
+        text-align: center;
+        background-color: var(--button-colour);
+        color: white;
+        padding: 0.25rem 2rem;
+        display: block;
+        border-radius: var(--corner-radius);
+      }
     }
   }
 }
 
-.image-and-text {
-  display: grid;
-  grid-template-areas: "left right";
-  gap: 0 var(--spacing);
+.box {
+  background-color: white;
+  margin: var(--spacing);
+  padding: var(--spacing);
+  border-radius: var(--corner-radius);
+}
+
+.img-overlay {
+  position: relative;
+  color: white;
+  background-color: var(--img-overlay-colour);
+  border-radius: var(--corner-radius);
+
   > img {
-    width: 80%;
-    height: auto;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-    justify-self: center;
-    align-self: center;
-  }
-
-  &.with-img-bg {
-    > img {
-      height: 100%;
-      width: 80%;
-      object-fit: cover;
-      &:not(:first-of-type) {
-        filter: brightness(0.7);
-      }
-    }
-
-    > div {
-      height: 100%;
-      width: 80%;
-      align-content: end;
-      justify-self: center;
-      color: white;
-      z-index: 1;
-      padding: 0 1rem;
-    }
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: var(--img-overlay-opacity);
   }
 
   > div {
-    align-self: center;
-  }
-
-  &.left {
-    grid-template-columns: 1fr 1fr;
-    > img {
-      grid-area: left;
-    }
-
-    &.with-img-bg {
-      > img:not(:first-of-type) {
-        grid-area: right;
-      }
-    }
-
-    > div {
-      grid-area: right;
-    }
-  }
-
-  &.right {
-    grid-template-columns: 1fr 1fr;
-    > img {
-      grid-area: right;
-    }
-
-    &.with-img-bg {
-      > img:not(:first-of-type) {
-        grid-area: left;
-      }
-    }
-
-    > div {
-      grid-area: left;
-    }
-  }
-}
-
-.two-images {
-  display: flex;
-  height: auto;
-
-  > img {
-    flex-shrink: 0;
-    height: 100px;
-    width: auto;
-    margin-right: 10px;
+    position: absolute;
+    bottom: 8px;
+    left: 16px;
   }
 }
