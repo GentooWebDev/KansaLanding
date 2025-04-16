@@ -20,9 +20,26 @@ a {
 }
 
 span[role="heading"] {
-  text-align: center;
-  font-weight: 700;
   font-size: x-large;
+
+  &:not([aria-level]) {
+    text-decoration: line-through;
+
+    &::after {
+      content: 'No "aria-level" set!';
+      display: inline;
+      padding: 0.1em 0.3em;
+      margin: 0.3em;
+      color: red;
+      background-color: #ffafaf;
+      border: 1px solid red;
+      border-radius: var(--corner-radius);
+    }
+  }
+
+  &[aria-level] {
+    font-weight: 700;
+  }
 }
 
 img {

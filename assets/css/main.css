@@ -2,7 +2,6 @@
 @import url("defaults.css") layer(defaults);
 @import url("components.css") layer(components);
 @import url("utilities.css") layer(utilities);
-@import url("overrides.css") layer(overrides);
 
 :root {
   --accent-colour: hsl(0, 0%, 90%);
@@ -19,6 +18,13 @@
   --top-links-min-gap: var(--spacing);
   --main-content-side-spacing: calc(var(--spacing) * 2);
   --main-content-max-width: 900px;
+
+  --primary: ;
+  --secondary: ;
+  --accent: ;
+  --light: ;
+  --dark: ;
+  --ui: ;
 }
 
 @layer site {
