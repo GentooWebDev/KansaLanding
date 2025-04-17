@@ -1,4 +1,4 @@
-@layer defaults, components, site, utilities, overrides;
+@layer defaults, components, site, utilities, page;
 @import url("defaults.css") layer(defaults);
 @import url("components.css") layer(components);
 @import url("utilities.css") layer(utilities);
