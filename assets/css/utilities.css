@@ -1,3 +1,13 @@
 .v-centre-self {
   align-self: center;
 }
+
+.width-control {
+  max-width: var(--content-usual-max-width);
+  width: 100%;
+  margin: auto;
+
+  &.wide {
+    max-width: var(--content-wide-max-width);
+  }
+}
