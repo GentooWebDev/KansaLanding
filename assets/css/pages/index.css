@@ -25,14 +25,6 @@
         border-radius: var(--corner-radius);
         height: 100%;
 
-        > span[role="heading"] {
-          margin-bottom: 0.25em;
-        }
-
-        > div > p:first-child {
-          margin-top: 0;
-        }
-
         > a:last-child {
           text-align: center;
           background-color: var(--button-colour);
@@ -45,4 +37,10 @@
       }
     }
   }
+}
+
+#about > .row:first-of-type {
+  background-color: var(--accent-colour);
+  padding: var(--spacing);
+  border-radius: var(--corner-radius);
 }
