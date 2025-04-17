@@ -28,6 +28,7 @@ const pages = [
     title: "Home",
     href: "/",
     filepath: "index.vto",
+    css: "index",
   },
   {
     title: "About",
