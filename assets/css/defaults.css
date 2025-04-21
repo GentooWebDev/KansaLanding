@@ -9,6 +9,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: Assistant, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: clamp(12px, 0.8vw, calc(var(--content-usual-max-width) * 0.02));
 }
 
 a {

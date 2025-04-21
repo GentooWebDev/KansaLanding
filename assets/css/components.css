@@ -42,7 +42,7 @@
 
 span[role="heading"] {
   display: block;
-  font-size: x-large;
+  font-size: 2em;
   text-align: center;
 
   &:not([aria-level]) {
