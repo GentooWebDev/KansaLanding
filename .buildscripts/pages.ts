@@ -20,7 +20,7 @@ type DefaultProvider<T> = (val: T) => {
 
 const defaultPage: DefaultProvider<Page> = (page) => ({
   css: false,
-  href: join("/", extractBaseName(page.filepath)),
+  href: join("/", extractDotlessBasename(page.filepath)),
 });
 
 const pages = [
@@ -71,6 +71,6 @@ export function getPageData(): Required<Page>[] {
   );
 }
 
-export function extractBaseName(filepath: string): string {
+export function extractDotlessBasename(filepath: string): string {
   return filepath.substring(0, filepath.lastIndexOf("."));
 }
