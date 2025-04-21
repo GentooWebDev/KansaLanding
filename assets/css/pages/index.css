@@ -1,29 +1,49 @@
 @layer page {
   #products {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto;
-    gap: var(--spacing);
-
-    > div {
+    /* Taken from .row in components.css */
+    @media (max-width: 600px) {
       display: flex;
       flex-direction: column;
+      align-items: center;
+    }
+
+    > div {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto 1fr auto;
       gap: var(--spacing);
 
       background-color: var(--accent-colour);
       padding: var(--spacing);
       border-radius: var(--corner-radius);
 
+      > img {
+        width: auto;
+        max-height: 50vh;
+        max-width: 100%;
+        justify-self: center;
+        grid-row: 1;
+      }
+
       > .box {
         display: grid;
         grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr auto;
+        grid-template-rows: subgrid;
+        grid-row: 2 / span 3;
 
         background-color: white;
         padding: var(--spacing);
         padding-top: calc(var(--spacing) * 0.5);
         border-radius: var(--corner-radius);
         height: 100%;
+
+        > span[role="heading"] {
+          grid-row: 1;
+        }
+
+        > div {
+          grid-row: 2;
+        }
 
         > a:last-child {
           text-align: center;
@@ -33,6 +53,7 @@
           display: block;
           border-radius: var(--corner-radius);
           margin: calc(var(--spacing) * -0.33);
+          grid-row: 3;
         }
       }
     }
