@@ -2,7 +2,7 @@
   display: grid;
   grid-auto-columns: 1fr;
   gap: var(--spacing);
-  margin: var(--spacing);
+  margin: var(--spacing) 0;
   align-items: stretch;
 
   @media (max-width: 480px) {
