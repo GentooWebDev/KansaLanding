@@ -20,6 +20,11 @@
   --content-usual-max-width: 900px;
   --content-wide-max-width: min(100%, 1150px);
 
+  @media (min-width: 1850px) {
+    --content-usual-max-width: 1133px;
+    --content-wide-max-width: min(100%, 1448px);
+  }
+
   --primary: ;
   --secondary: ;
   --accent: ;
