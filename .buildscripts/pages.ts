@@ -7,6 +7,7 @@ interface Page {
   filepath: string;
   href?: string;
   css?: false | string;
+  js?: false | string;
 }
 
 type NavEntry = typeof pages[number]["title"] | { href: string };
@@ -29,6 +30,7 @@ const pages = [
     href: "/",
     filepath: "index.vto",
     css: "index",
+    js: "switcher",
   },
   {
     title: "About",

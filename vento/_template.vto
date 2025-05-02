@@ -13,6 +13,9 @@
     {{ if currentPage.css }}
       <link rel="stylesheet" href="/assets/css/pages/{{ currentPage.css }}.css">
     {{ /if }}
+    {{ if currentPage.js }}
+      <script async defer src="/assets/js/{{ currentPage.js }}.js"></script>
+    {{ /if }}
     <title>Kansa | {{ currentPage.title }}</title>
   </head>
   <body>
