@@ -73,3 +73,16 @@
   padding: var(--spacing);
   border-radius: var(--corner-radius);
 }
+
+#switcher {
+  border: none;
+  background-color: var(--button-colour);
+  border-radius: calc(var(--corner-radius) * 4);
+  color: white;
+  padding: 1rem 0.5rem;
+  font-weight: 700;
+
+  position: fixed;
+  top: 5em;
+  left: 2em;
+}
