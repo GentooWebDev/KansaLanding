@@ -49,11 +49,19 @@
           text-align: center;
           background-color: var(--button-colour);
           color: white;
-          padding: 0.25rem 2rem;
+          padding: 0.5rem 2rem;
           display: block;
           border-radius: var(--corner-radius);
           margin: calc(var(--spacing) * -0.33);
           grid-row: 3;
+          font-weight: 700;
+          font-size: 1.1em;
+          line-height: 1;
+          transition: letter-spacing 0.25s ease-out;
+
+          &:hover {
+            letter-spacing: 0.5px;
+          }
         }
       }
     }
