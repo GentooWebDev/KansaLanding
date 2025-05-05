@@ -17,12 +17,10 @@
   --top-links-max-gap: 3vw;
   --top-links-min-gap: var(--spacing);
   --main-content-side-spacing: calc(var(--spacing) * 2);
-  --content-usual-max-width: 900px;
-  --content-wide-max-width: min(100%, 1150px);
+  --content-max-width: min(100%, 1150px);
 
   @media (min-width: 1850px) {
-    --content-usual-max-width: 1133px;
-    --content-wide-max-width: min(100%, 1448px);
+    --content-max-width: min(100%, 1448px);
   }
 
   --primary: ;

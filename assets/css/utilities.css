@@ -3,11 +3,7 @@
 }
 
 .width-control {
-  max-width: var(--content-usual-max-width);
+  max-width: var(--content-max-width);
   width: 100%;
   margin: auto;
-
-  &.wide {
-    max-width: var(--content-wide-max-width);
-  }
 }

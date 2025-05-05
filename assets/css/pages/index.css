@@ -68,10 +68,11 @@
   }
 }
 
-#images > .row:first-of-type {
+#images {
   background-color: var(--accent-colour);
   padding: var(--spacing);
   border-radius: var(--corner-radius);
+  margin: var(--spacing) auto;
 }
 
 #switcher {
