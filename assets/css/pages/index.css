@@ -49,13 +49,13 @@
           text-align: center;
           background-color: var(--button-colour);
           color: white;
-          padding: 0.5rem 2rem;
+          padding: 0.75rem 15%;
           display: block;
-          border-radius: var(--corner-radius);
-          margin: calc(var(--spacing) * -0.33);
+          border-radius: calc(var(--corner-radius) * 2);
+          margin: calc(var(--spacing) * -0.33) auto;
           grid-row: 3;
           font-weight: 700;
-          font-size: 1.1em;
+          font-size: 1.33em;
           line-height: 1;
           transition: letter-spacing 0.25s ease-out;
 
