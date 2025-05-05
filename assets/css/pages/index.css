@@ -68,7 +68,7 @@
   }
 }
 
-#about > .row:first-of-type {
+#images > .row:first-of-type {
   background-color: var(--accent-colour);
   padding: var(--spacing);
   border-radius: var(--corner-radius);
