@@ -1,5 +1,5 @@
 @layer page {
-  #products {
+  #stores {
     /* Taken from .row in components.css */
     @media (max-width: 600px) {
       display: flex;
