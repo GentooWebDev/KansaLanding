@@ -30,7 +30,6 @@ const pages = [
     href: "/",
     filepath: "index.vto",
     css: "index",
-    js: "switcher",
   },
   {
     title: "About",
