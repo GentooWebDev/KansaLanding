@@ -27,7 +27,7 @@ jobs:
         with:
           deno-version: v2.x
       - name: Build site with Deno script
-        run: deno run --allow-read=. --allow-write=./serve ./.buildscripts/build.ts .
+        run: ./build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
