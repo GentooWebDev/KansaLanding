@@ -1,0 +1,2 @@
+#!/bin/bash
+./build --watch=./vento,./assets,./.buildscripts
