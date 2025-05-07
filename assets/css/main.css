@@ -5,13 +5,14 @@
 
 :root {
   --accent-colour: hsl(0, 0%, 90%);
-  --inactive-top-link-colour: hsl(0, 0%, 50%);
+  --inactive-nav-link-colour: hsl(0, 0%, 50%);
+  --active-nav-link-colour: black;
   --separator-colour: hsl(0, 0%, 65%);
   --img-overlay-colour: hsl(280 100% 5%);
   --img-overlay-opacity: 60%;
-  --active-top-link-colour: black;
-  --button-colour: hsl(281, 100%, 15%);
-  --footer-colour: lightgray;
+  --button-colour: #1a1851;
+  --footer-colour: var(--button-colour);
+  --footer-text-colour: white;
   --corner-radius: 6px;
   --spacing: 1rem;
   --top-links-max-gap: 3vw;
@@ -47,11 +48,11 @@
     list-style: none;
 
     > li > a {
-      color: var(--inactive-top-link-colour);
+      color: var(--inactive-nav-link-colour);
 
       &.current,
       &:hover {
-        color: var(--active-top-link-colour);
+        color: var(--active-nav-link-colour);
         text-decoration: underline;
         text-decoration-thickness: 1px;
         text-underline-offset: 2px;
@@ -75,6 +76,7 @@
 
     > img {
       width: min(13rem, 45vw);
+      margin: 1.5rem;
     }
 
     > nav > ul {
@@ -82,6 +84,8 @@
       justify-content: space-around;
       align-items: center;
       gap: max(var(--top-links-min-gap), var(--top-links-max-gap));
+      font-weight: 600;
+      font-size: 1.2em;
     }
   }
 
@@ -93,17 +97,44 @@
 
   body > footer {
     background-color: var(--footer-colour);
+    color: var(--footer-text-colour);
+    font-weight: 500;
     padding: 3rem 1.5rem;
     margin-top: var(--spacing);
 
+    --inactive-nav-link-colour: var(--footer-text-colour);
+    --active-nav-link-colour: var(--footer-text-colour);
+
+    > nav > ul > li > a {
+      font-weight: 700;
+    }
+
     display: grid;
     grid-template-columns: auto minmax(auto, 75%);
+    gap: var(--spacing);
 
     > details {
       align-self: center;
 
       > summary {
         text-align: right;
+        cursor: pointer;
+      }
+
+      &[open] {
+        #cont {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+
+          background-color: rebeccapurple;
+          padding: 1rem 1rem;
+          border-radius: var(--corner-radius);
+
+          > * {
+            margin: 0;
+          }
+        }
       }
     }
 
