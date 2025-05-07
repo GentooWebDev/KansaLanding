@@ -33,10 +33,6 @@
   > div {
     position: absolute;
     inset: auto 16px 12px;
-
-    > * {
-      margin: 0;
-    }
   }
 }
 
