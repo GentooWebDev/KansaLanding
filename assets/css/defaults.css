@@ -43,4 +43,11 @@ img {
   h3 {
     margin-inline-start: -0.3em;
   }
+
+  @media (max-width: 450px) {
+    :is(h1, h2, h3):not(.keep-left) {
+      margin: auto;
+      text-align: center;
+    }
+  }
 }
