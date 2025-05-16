@@ -32,15 +32,15 @@ img {
 }
 
 :where(main, section) {
-  > h1 {
+  h1 {
     margin-inline-start: -0.7em;
   }
 
-  > h2 {
+  h2 {
     margin-inline-start: -0.5em;
   }
 
-  > h3 {
+  h3 {
     margin-inline-start: -0.3em;
   }
 }
