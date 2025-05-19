@@ -8,9 +8,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/main.css">
     {{ if currentPage.css }}
+      {{ if typeof currentPage.css === 'string' }}
+        {{> currentPage.css = [ currentPage.css ] }}
+      {{ /if }}
+
       <link rel="stylesheet" href="/assets/css/pages/{{ currentPage.css }}.css">
     {{ /if }}
     {{ if currentPage.js }}
+      {{ if typeof currentPage.js === 'string' }}
+        {{> currentPage.js = [ currentPage.js ] }}
+      {{ /if }}
+
       <script async defer src="/assets/js/{{ currentPage.js }}.js"></script>
     {{ /if }}
     <title>Kansa | {{ currentPage.title }}</title>

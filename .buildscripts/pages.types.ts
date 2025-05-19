@@ -4,8 +4,8 @@ export interface Page {
   title: string;
   filepath: string;
   href?: string;
-  css?: false | string;
-  js?: false | string;
+  css?: false | string | string[];
+  js?: false | string | string[];
 }
 
 export type NavEntry = string | { href: string };
