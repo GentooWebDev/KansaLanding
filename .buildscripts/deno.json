@@ -1,13 +1,14 @@
 {
   "imports": {
-    "@csstools/postcss-minify": "npm:@csstools/postcss-minify@^2.0.3",
-    "autoprefixer": "npm:autoprefixer@^10.4.21",
-    "doiuse": "npm:doiuse@^6.0.5",
-    "fs": "jsr:@std/fs@^1.0.13",
+    "@dprint/formatter": "jsr:@dprint/formatter@^0.4.1",
     "path": "jsr:@std/path@^1.0.8",
+    "fs": "jsr:@std/fs@^1.0.13",
+    "vento": "jsr:@vento/vento@^1.12.15",
     "postcss": "npm:postcss@^8.5.3",
     "postcss-nested": "npm:postcss-nested@^7.0.2",
-    "vento": "jsr:@vento/vento@^1.12.15"
+    "autoprefixer": "npm:autoprefixer@^10.4.21",
+    "@csstools/postcss-minify": "npm:@csstools/postcss-minify@^2.0.3",
+    "doiuse": "npm:doiuse@^6.0.5"
   },
   "fmt": {
     "lineWidth": 95

@@ -1,4 +1,4 @@
-import type { NavBar, Page } from "./pages.types.ts";
+import type { NavBar, Page } from "./pages.ts";
 
 export const pages: Page[] = [
   {

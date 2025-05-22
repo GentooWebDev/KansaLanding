@@ -1,121 +1,111 @@
-import { copy, ensureDir, existsSync } from "fs";
-import { join, resolve } from "path";
+import { createStreaming } from "@dprint/formatter";
+import { copy, ensureDir, ensureFile, exists } from "fs";
+import { dirname, join } from "path";
 import vento from "vento";
+import { REMOVE_DIRECTORY_KEYS, REQUIRED_DIRECTORIES } from "./directories.config.ts";
 import { getPageData, navData } from "./pages.ts";
+import { processFiles } from "./utils/files.ts";
+import { PROJECT_ROOT } from "./utils/init.ts";
 import * as log from "./utils/log.ts";
 import { transformCSS } from "./utils/postcss.ts";
-import { processFiles } from "./utils/files.ts";
-import postcss from "postcss";
+import { PromiseCollection } from "./utils/promises.ts";
 
-log.debug("Started - validating environment.");
-log.debug("Arguments:", Deno.args);
+// Remove directories that need to be deleted before compilation
+async function removeDirectories() {
+  const removePromises = new PromiseCollection("consecutive");
 
-if (Deno.args.length !== 1) {
-  throw new Error(
-    "Invalid argument list! Please supply exactly one - the path to the project root.",
-  );
+  for (const key of REMOVE_DIRECTORY_KEYS) {
+    const dir = REQUIRED_DIRECTORIES[key];
+    removePromises.add(async () => {
+      if (await exists(dir)) {
+        await Deno.remove(dir, { recursive: true });
+        log.info(`Removed ${key} directory.`);
+      } else log.info(`${key} directory not present, not removing.`);
+    });
+  }
+
+  await removePromises.execute();
+  log.debug("Clean directory structure ensured.");
 }
 
-const PROJECT_ROOT = resolve(Deno.cwd(), Deno.args[0]);
-log.debug(`Resolved build path: ${PROJECT_ROOT}`);
+// Copy static assets to the serve directory (except CSS)
+async function copyAssets() {
+  try {
+    // Copy all assets
+    await copy(REQUIRED_DIRECTORIES.assets, REQUIRED_DIRECTORIES.servedAssets);
+    log.info("Assets copied successfully.");
 
-if (!existsSync(PROJECT_ROOT, { isDirectory: true })) {
-  throw new Error(`Specified project root \"${PROJECT_ROOT}\" does not exist!`);
+    // Remove copied css directory - will be recompiled
+    await Deno.remove(REQUIRED_DIRECTORIES.servedCss, { recursive: true });
+    log.info("CSS files removed from assets - will be compiled and optimised.");
+  } catch (err) {
+    log.error("An error occurred while copying assets.");
+    throw err;
+  }
 }
 
-const REQUIRED_DIRECTORIES = {
-  vento: join(PROJECT_ROOT, "vento"),
-  assets: join(PROJECT_ROOT, "assets"),
-  img: join(PROJECT_ROOT, "assets/img"),
-  css: join(PROJECT_ROOT, "assets/css"),
-  serve: join(PROJECT_ROOT, "serve"),
-  logs: join(PROJECT_ROOT, "logs"),
-};
+// Compile and optimise CSS files
+async function compileCSS() {
+  log.info("Preparing to compile CSS...");
 
-if (existsSync(REQUIRED_DIRECTORIES.serve)) {
-  Deno.removeSync(REQUIRED_DIRECTORIES.serve, { recursive: true });
-  log.info("Removed output directory.");
-}
-
-if (existsSync(REQUIRED_DIRECTORIES.logs)) {
-  Deno.removeSync(REQUIRED_DIRECTORIES.logs, { recursive: true });
-  log.info("Removed CSS logs directory.");
-}
-
-await Promise.all(
-  Object.values(REQUIRED_DIRECTORIES).map((dir) => ensureDir(dir)),
-);
-
-log.debug("Required directories created.");
-
-const ASSETS_OUTPUT = join(REQUIRED_DIRECTORIES.serve, "assets");
-const CSS_OUTPUT = join(ASSETS_OUTPUT, "css");
-
-try {
-  await copy(REQUIRED_DIRECTORIES.assets, ASSETS_OUTPUT);
-  log.info("Assets copied successfully.");
-
-  Deno.removeSync(CSS_OUTPUT, { recursive: true });
-  log.info("CSS files removed from assets - will be compiled and optimised.");
-} catch (err) {
-  log.error("An error occurred while copying assets.");
-  throw err;
-}
-
-async function compileCSS(): Promise<void> {
-  log.info("Compiling CSS...");
-
-  const warnings: postcss.Warning[] = [];
-  const diuWarnings: unknown[] = [];
-  const messages: postcss.Message[] = [];
+  const logPromises = new PromiseCollection("parallel");
 
   await processFiles(
     REQUIRED_DIRECTORIES.css,
-    CSS_OUTPUT,
+    REQUIRED_DIRECTORIES.servedCss,
     ".css",
-    async ({ inputPath, outputPath, contents }) => {
+    ({ inputPath, outputPath, content }) => {
       log.info(`Compiling CSS file ${inputPath} into ${outputPath}`);
 
-      const result = await transformCSS(contents, inputPath);
+      return transformCSS(content, inputPath, (logCategories) => {
+        for (const [category, msgs] of Object.entries(logCategories)) {
+          for (const msg of msgs) {
+            logPromises.add(async () => {
+              const fullPath = join(
+                REQUIRED_DIRECTORIES.logs,
+                "css",
+                category,
+                inputPath.substring(REQUIRED_DIRECTORIES.css.length) + ".log",
+              );
 
-      warnings.push(...result.warnings);
-      diuWarnings.push(...result.diuWarnings);
-      messages.push(...result.messages);
-
-      return result.output;
+              await ensureDir(dirname(fullPath));
+              await Deno.writeTextFile(
+                fullPath,
+                msg.toString !== Object.prototype.toString
+                  ? msg.toString()
+                  : Deno.inspect(msg),
+              );
+            });
+          }
+        }
+      });
     },
   );
 
-  log.info("CSS compilation completed. Saving warnings and messages to logs directory.");
-  Promise.all([
-    Deno.writeTextFile(
-      join(REQUIRED_DIRECTORIES.logs, "warnings.log"),
-      warnings.map((w) => w.toString()).join("\n"),
-    ),
-    Deno.writeTextFile(
-      join(REQUIRED_DIRECTORIES.logs, "doiuse.log"),
-      diuWarnings.map((w) => JSON.stringify(w)).join("\n"),
-    ),
-    Deno.writeTextFile(
-      join(REQUIRED_DIRECTORIES.logs, "messages.log"),
-      messages.map((m) => m.toString()).join("\n"),
-    ),
-    Deno.writeTextFile(
-      join(REQUIRED_DIRECTORIES.logs, "warnings.log.jsonish"),
-      warnings.map((w) => Deno.inspect(w)).join("\n"),
-    ),
-    Deno.writeTextFile(
-      join(REQUIRED_DIRECTORIES.logs, "doiuse.log.jsonish"),
-      diuWarnings.map((w) => Deno.inspect(w)).join("\n"),
-    ),
-    Deno.writeTextFile(
-      join(REQUIRED_DIRECTORIES.logs, "messages.log.jsonish"),
-      messages.map((m) => Deno.inspect(m)).join("\n"),
-    ),
-  ]).then(() => log.debug("CSS compilation warnings and messages saved."));
+  log.info("CSS compilation completed.");
+  logPromises.execute().then(() => log.info("CSS compilation logs saved."));
 }
 
-async function compilePages(): Promise<void> {
+// Compile page templates to HTML
+async function compilePages() {
+  log.info("Preparing to compile pages...");
+  log.info("Obtaining markup formatting plugin...");
+
+  const formatter = createStreaming(
+    fetch("https://plugins.dprint.dev/g-plane/markup_fmt-v0.20.0.wasm"),
+  ).then((formatter) => {
+    //                                i32 limit
+    formatter.setConfig({ lineWidth: 2147483647 }, {
+      formatComments: true,
+      scriptIndent: true,
+      styleIndent: true,
+      closingTagLineBreakForEmpty: true,
+    });
+
+    log.info("Markup formatting plugin downloaded.");
+    return formatter;
+  });
+
   const renderer = vento({
     autoDataVarname: true,
     autoescape: false,
@@ -125,26 +115,44 @@ async function compilePages(): Promise<void> {
 
   const pages = getPageData();
 
-  log.info("Compiling Pages...");
-
   await processFiles(
     REQUIRED_DIRECTORIES.vento,
     REQUIRED_DIRECTORIES.serve,
     ".html",
-    async ({ inputPath, outputPath, contents }) => {
+    async ({ inputPath, outputPath, content }) => {
       const page = pages.find((p) =>
         join(REQUIRED_DIRECTORIES.vento, p.filepath) === inputPath
       );
 
       if (!page) return;
 
-      log.info(`Compiling page template ${inputPath} into ${outputPath}`);
-
-      return (await renderer.runString(
-        contents,
+      const result = await renderer.runString(
+        content,
         { pages, navData, currentPage: page },
         inputPath,
-      )).content;
+      );
+
+      const errFilePath = join(
+        REQUIRED_DIRECTORIES.bad_code,
+        inputPath.substring(PROJECT_ROOT.length),
+      );
+
+      try {
+        return await formatter.then((formatter) => {
+          log.info(`Compiling page template ${inputPath} into ${outputPath}`);
+
+          return formatter.formatText({
+            filePath: errFilePath,
+            fileText: result.content,
+          });
+        });
+      } catch (err: unknown) {
+        await ensureFile(errFilePath);
+        Deno.writeTextFile(errFilePath, result.content);
+        log.error(`Dumped mid-compilation code to ${errFilePath}!`);
+
+        throw err;
+      }
     },
   );
 
@@ -152,6 +160,8 @@ async function compilePages(): Promise<void> {
 }
 
 try {
+  await removeDirectories();
+  await copyAssets();
   await Promise.all([compileCSS(), compilePages()]);
   log.info("Build process completed successfully.");
 } catch (err) {

@@ -1,3 +1,4 @@
 serve/
 logs/
+bad_code/
 .buildscripts/deno.lock

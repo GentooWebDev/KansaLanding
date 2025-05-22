@@ -1,2 +1,2 @@
 #!/bin/bash
-BROWSERSLIST="cover 95% and last 10 versions and not dead, Firefox ESR, not OperaMini all, not and_uc > 0, not and_qq > 0, not kaios > 0, not Baidu > 0" deno run --allow-env --allow-read --allow-write=./serve,./logs $@ ./.buildscripts/build.ts .
+BROWSERSLIST="cover 95% and last 10 versions and not dead, last 5 major versions and not dead, Firefox ESR, not OperaMini all, not and_uc > 0, not and_qq > 0, not kaios > 0, not Baidu > 0" deno run --allow-env --allow-read --allow-write=./serve,./logs,./bad_code --allow-net=plugins.dprint.dev:443 $@ ./.buildscripts/build.ts .

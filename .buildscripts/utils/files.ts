@@ -1,17 +1,18 @@
 import { ensureDir, walk } from "fs";
 import { dirname, join } from "path";
-import { stripExtension } from "./path.ts";
 import * as log from "./log.ts";
+import { stripExtension } from "./path.ts";
+import { PromiseCollection } from "./promises.ts";
 
 export async function processFiles(
   inputDir: string,
   outputDir: string,
   outputExtension: string,
   processFile: (
-    data: { inputPath: string; outputPath: string; contents: string },
+    data: { inputPath: string; outputPath: string; content: string },
   ) => Promise<string | undefined>,
-): Promise<void> {
-  const tasks = Array<Promise<void>>();
+) {
+  const tasks = new PromiseCollection("parallel");
 
   for await (const file of walk(inputDir, { includeSymlinks: false, includeDirs: false })) {
     const destination = join(
@@ -21,19 +22,23 @@ export async function processFiles(
 
     await ensureDir(dirname(destination));
 
-    tasks.push(
-      processFile({
-        inputPath: file.path,
-        outputPath: destination,
-        contents: await Deno.readTextFile(file.path),
-      }).then((result) =>
-        result ? Deno.writeTextFile(destination, result, { createNew: true }) : void 0
-      ).catch((err) => {
+    tasks.add(async () => {
+      try {
+        const result = await processFile({
+          inputPath: file.path,
+          outputPath: destination,
+          content: await Deno.readTextFile(file.path),
+        });
+
+        if (result !== undefined) {
+          await Deno.writeTextFile(destination, result, { createNew: true });
+        }
+      } catch (err: unknown) {
         log.error(`Error processing file: ${file.path}`);
         throw err;
-      }),
-    );
+      }
+    });
   }
 
-  await Promise.all(tasks);
+  await tasks.execute();
 }
