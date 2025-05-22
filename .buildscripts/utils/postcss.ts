@@ -4,22 +4,21 @@ import doiuse from "doiuse";
 import postcss from "postcss";
 import nested from "postcss-nested";
 
-export async function transformCSS(styles: string, source: string) {
-  const diuWarnings: unknown[] = [];
-
-  const processor = postcss([
-    nested,
-    autoprefixer,
-    minify,
-    doiuse({ onFeatureUsage: (usageInfo: unknown) => diuWarnings.push(usageInfo) }),
-  ]);
+export async function transformCSS(
+  styles: string,
+  source: string,
+  messageConsumer?: (msgs: {
+    processing: postcss.Message[];
+    support: postcss.Message[];
+  }) => void,
+) {
+  const processor = postcss([nested, autoprefixer, minify]);
+  const checker = postcss([doiuse({ ignore: ["css-focus-visible"] })]);
 
   const result = await processor.process(styles, { from: source });
+  const doIUseResult = await checker.process(result.css, { from: undefined });
 
-  return {
-    warnings: result.warnings(),
-    diuWarnings,
-    messages: result.messages,
-    output: result.css,
-  };
+  messageConsumer?.({ processing: result.messages, support: doIUseResult.messages });
+
+  return result.css;
 }

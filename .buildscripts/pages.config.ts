@@ -1,4 +1,4 @@
-import type { NavBar, Page } from "./pages.types.ts";
+import type { NavBar, Page } from "./pages.ts";
 
 export const pages: Page[] = [
   {
@@ -22,6 +22,11 @@ export const pages: Page[] = [
   {
     title: "Refunds Policy",
     filepath: "refunds.vto",
+  },
+  {
+    title: "404 - Not Found",
+    filepath: "404.vto",
+    js: "needs-js",
   },
 ];
 
