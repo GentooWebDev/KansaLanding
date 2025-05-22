@@ -1,2 +1,3 @@
 serve/
+logs/
 .buildscripts/deno.lock

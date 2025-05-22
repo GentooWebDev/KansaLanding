@@ -1,212 +1,160 @@
-import { copy, ensureDir, existsSync, walk } from "fs";
-import { dirname, extname, join, resolve } from "path";
+import { copy, ensureDir, existsSync } from "fs";
+import { join, resolve } from "path";
 import vento from "vento";
-import { extractDotlessBasename, getPageData, navData } from "./pages.ts";
-import { compile as compileSass } from "npm:sass";
+import { getPageData, navData } from "./pages.ts";
+import * as log from "./utils/log.ts";
+import { transformCSS } from "./utils/postcss.ts";
+import { processFiles } from "./utils/files.ts";
+import postcss from "postcss";
 
-console.debug("Started - not yet validated environment.");
-console.debug("Unparsed Args:", Deno.args);
+log.debug("Started - validating environment.");
+log.debug("Arguments:", Deno.args);
 
-const [flags, args] = Deno.args.reduce((acc, arg) => {
-  if (arg.startsWith("--")) {
-    acc[0].push(arg.substring(2));
-  } else {
-    acc[1].push(arg);
-  }
-
-  return acc;
-}, [Array<string>(), Array<string>()]);
-
-console.debug("Parsed Args:", args);
-console.debug("Parsed Flags:", flags);
-
-// Check if we have a path supplied
-if (args.length !== 1) {
-  throw "Invalid argument list! Please supply exactly one - the path to the build root.";
-}
-
-if (flags.length > 1 || (flags.length === 1 && flags[0] !== "cautious")) {
-  throw "Invalid flags! Only one is valid: --cautious.";
-}
-
-const cautious = flags[0] === "cautious";
-
-function doCautiously<T>(msg: string, cb: () => T): T {
-  if (!cautious || confirm(msg)) return cb();
-}
-
-if (cautious) {
-  console.warn(
-    "%c-=-=<[CAUTIOUS MODE ENABLED, WILL PROMPT BEFORE MAKING POTENTIALLY DESTRUCTIVE CHANGES]>=-=-",
-    "color: red; font-weight: bold;",
+if (Deno.args.length !== 1) {
+  throw new Error(
+    "Invalid argument list! Please supply exactly one - the path to the project root.",
   );
 }
 
-console.debug("Args valid. Resolving path...");
+const PROJECT_ROOT = resolve(Deno.cwd(), Deno.args[0]);
+log.debug(`Resolved build path: ${PROJECT_ROOT}`);
 
-// Resolve the provided path against the current working directory.
-// If an absolute path is provided, that will be used. If a relative
-// path is provided, it will be expanded to an absolute path from
-// the current working directory.
-const PATH = resolve(Deno.cwd(), Deno.args[0]);
-
-console.debug("Path:", PATH);
-
-// If no folder exists at `PATH`, then throw an error
-if (!existsSync(PATH, { isDirectory: true })) {
-  throw `Specified build root "${PATH}" does not exist!`;
+if (!existsSync(PROJECT_ROOT, { isDirectory: true })) {
+  throw new Error(`Specified project root \"${PROJECT_ROOT}\" does not exist!`);
 }
 
-console.debug(
-  "Path exists! Creating required directory structure in memory.",
-);
+const REQUIRED_DIRECTORIES = {
+  vento: join(PROJECT_ROOT, "vento"),
+  assets: join(PROJECT_ROOT, "assets"),
+  img: join(PROJECT_ROOT, "assets/img"),
+  css: join(PROJECT_ROOT, "assets/css"),
+  serve: join(PROJECT_ROOT, "serve"),
+  logs: join(PROJECT_ROOT, "logs"),
+};
 
-const REQUIRED_DIRECTORIES = Object.fromEntries(
-  ([
-    "vento",
-    "assets",
-    "assets/img",
-    "assets/css",
-    "serve",
-  ] as const).map((dir) => [dir, join(PATH, dir)] as const),
-);
-
-if (existsSync(REQUIRED_DIRECTORIES["serve"])) {
-  doCautiously(
-    `Delete directory ${REQUIRED_DIRECTORIES["serve"]}?`,
-    () => Deno.removeSync(REQUIRED_DIRECTORIES["serve"], { recursive: true }),
-  );
+if (existsSync(REQUIRED_DIRECTORIES.serve)) {
+  Deno.removeSync(REQUIRED_DIRECTORIES.serve, { recursive: true });
+  log.info("Removed output directory.");
 }
 
-console.debug("Creating required directories...");
+if (existsSync(REQUIRED_DIRECTORIES.logs)) {
+  Deno.removeSync(REQUIRED_DIRECTORIES.logs, { recursive: true });
+  log.info("Removed CSS logs directory.");
+}
+
 await Promise.all(
-  Object.values(REQUIRED_DIRECTORIES).map((dir) =>
-    existsSync(dir)
-      ? undefined
-      : doCautiously(`Create directory ${dir}?`, () => ensureDir(dir))
-  ),
+  Object.values(REQUIRED_DIRECTORIES).map((dir) => ensureDir(dir)),
 );
 
-console.debug("Copying assets...");
-const ASSETS_DEST = join(REQUIRED_DIRECTORIES["serve"], "assets");
-await doCautiously(
-  `Copy directory ${REQUIRED_DIRECTORIES["assets"]} to ${ASSETS_DEST}?`,
-  () =>
-    copy(REQUIRED_DIRECTORIES["assets"], ASSETS_DEST).then(() => {
-      console.log("Successfully copied assets! Deleting CSS files...");
-      const CSS_ASSETS_DEST = join(ASSETS_DEST, "css");
-      doCautiously(
-        `Delete ${CSS_ASSETS_DEST}?`,
-        () => Deno.removeSync(CSS_ASSETS_DEST, { recursive: true }),
-      );
-    }).catch((err) => {
-      console.error(
-        "%cAn error occurred copying assets!",
-        "color: red; font-weight: bold;",
-      );
-      throw err;
-    }),
-);
+log.debug("Required directories created.");
 
-console.debug("Done. Starting parallel tasks:");
+const ASSETS_OUTPUT = join(REQUIRED_DIRECTORIES.serve, "assets");
+const CSS_OUTPUT = join(ASSETS_OUTPUT, "css");
 
-console.debug("Compiling SCSS...");
-const COMPILE_SCSS = Array<Promise<void>>();
-for await (
-  const file of walk(REQUIRED_DIRECTORIES["assets/css"], {
-    includeSymlinks: false,
-    includeDirs: false,
-  })
-) {
-  const isScss = file.name.endsWith(".scss");
+try {
+  await copy(REQUIRED_DIRECTORIES.assets, ASSETS_OUTPUT);
+  log.info("Assets copied successfully.");
 
-  const destination = join(
-    ASSETS_DEST,
-    "css",
-    file.path.substring(
-      REQUIRED_DIRECTORIES["assets/css"].length,
-      file.path.length - extname(file.path).length,
-    ) + ".css",
-  );
-  const destFolder = dirname(destination);
-
-  if (!existsSync(destFolder)) {
-    await doCautiously(
-      `Create directory ${destFolder}`,
-      () => ensureDir(destFolder),
-    );
-  }
-
-  console.log(
-    `${isScss ? "Compiling" : "Copying"} ${file.path} into ${destination}`,
-  );
-  COMPILE_SCSS.push(
-    !isScss
-      ? doCautiously(
-        `Copy CSS file from ${file.path} to ${destination}?`,
-        () => copy(file.path, destination),
-      )
-      : doCautiously(
-        `Compile ${file.path} into ${destination}?`,
-        () =>
-          Deno.writeTextFile(destination, compileSass(file.path).css, {
-            createNew: true,
-          }),
-      ).catch((err) => {
-        const message = `Error ${isScss ? "compiling SCSS" : "copying CSS"}!`;
-        try {
-          err.message = `${message}\n->\n` + (err?.message ?? "");
-        } catch {
-          console.error(
-            "Could not set custom error message - should have been:",
-            message,
-          );
-        }
-        throw err;
-      }),
-  );
+  Deno.removeSync(CSS_OUTPUT, { recursive: true });
+  log.info("CSS files removed from assets - will be compiled and optimised.");
+} catch (err) {
+  log.error("An error occurred while copying assets.");
+  throw err;
 }
 
-console.debug("Compiling pages...");
+async function compileCSS(): Promise<void> {
+  log.info("Compiling CSS...");
 
-const v = vento({
-  autoDataVarname: true,
-  autoescape: false,
-  dataVarname: "it",
-  includes: REQUIRED_DIRECTORIES["vento"],
-});
+  const warnings: postcss.Warning[] = [];
+  const diuWarnings: unknown[] = [];
+  const messages: postcss.Message[] = [];
 
-const pages = getPageData();
+  await processFiles(
+    REQUIRED_DIRECTORIES.css,
+    CSS_OUTPUT,
+    ".css",
+    async ({ inputPath, outputPath, contents }) => {
+      log.info(`Compiling CSS file ${inputPath} into ${outputPath}`);
 
-const COMPILE_PAGES = pages.map((page) => {
-  const srcPath = join(REQUIRED_DIRECTORIES["vento"], page.filepath);
-  const outPath = join(
-    REQUIRED_DIRECTORIES["serve"],
-    extractDotlessBasename(page.filepath) + ".html",
+      const result = await transformCSS(contents, inputPath);
+
+      warnings.push(...result.warnings);
+      diuWarnings.push(...result.diuWarnings);
+      messages.push(...result.messages);
+
+      return result.output;
+    },
   );
 
-  console.log(`Processing ${srcPath}`);
+  log.info("CSS compilation completed. Saving warnings and messages to logs directory.");
+  Promise.all([
+    Deno.writeTextFile(
+      join(REQUIRED_DIRECTORIES.logs, "warnings.log"),
+      warnings.map((w) => w.toString()).join("\n"),
+    ),
+    Deno.writeTextFile(
+      join(REQUIRED_DIRECTORIES.logs, "doiuse.log"),
+      diuWarnings.map((w) => JSON.stringify(w)).join("\n"),
+    ),
+    Deno.writeTextFile(
+      join(REQUIRED_DIRECTORIES.logs, "messages.log"),
+      messages.map((m) => m.toString()).join("\n"),
+    ),
+    Deno.writeTextFile(
+      join(REQUIRED_DIRECTORIES.logs, "warnings.log.jsonish"),
+      warnings.map((w) => Deno.inspect(w)).join("\n"),
+    ),
+    Deno.writeTextFile(
+      join(REQUIRED_DIRECTORIES.logs, "doiuse.log.jsonish"),
+      diuWarnings.map((w) => Deno.inspect(w)).join("\n"),
+    ),
+    Deno.writeTextFile(
+      join(REQUIRED_DIRECTORIES.logs, "messages.log.jsonish"),
+      messages.map((m) => Deno.inspect(m)).join("\n"),
+    ),
+  ]).then(() => log.debug("CSS compilation warnings and messages saved."));
+}
 
-  return v.run(srcPath, { pages, navData, currentPage: page }).then(
-    (result) => {
-      if (cautious) {
-        confirm(`Create rendered result of ${srcPath} at ${outPath}?`);
-      }
+async function compilePages(): Promise<void> {
+  const renderer = vento({
+    autoDataVarname: true,
+    autoescape: false,
+    dataVarname: "it",
+    includes: REQUIRED_DIRECTORIES.vento,
+  });
 
-      console.log(`Creating file ${outPath}`);
-      return Deno.writeTextFile(outPath, result.content);
+  const pages = getPageData();
+
+  log.info("Compiling Pages...");
+
+  await processFiles(
+    REQUIRED_DIRECTORIES.vento,
+    REQUIRED_DIRECTORIES.serve,
+    ".html",
+    async ({ inputPath, outputPath, contents }) => {
+      const page = pages.find((p) =>
+        join(REQUIRED_DIRECTORIES.vento, p.filepath) === inputPath
+      );
+
+      if (!page) return;
+
+      log.info(`Compiling page template ${inputPath} into ${outputPath}`);
+
+      return (await renderer.runString(
+        contents,
+        { pages, navData, currentPage: page },
+        inputPath,
+      )).content;
     },
-  ).catch((err) => {
-    err.message = `Error processing ${srcPath}!\n->\n` + (err?.message ?? "");
-    throw err;
-  });
-});
+  );
 
-Promise.all([
-  ...COMPILE_SCSS,
-  ...COMPILE_PAGES,
-]).then(() => console.info("%cAll done!", "color: blue; font-weight: bold;"))
-  .catch((err) => {
-    console.error("%cAn error occurred!", "color: red; font-weight: bold;");
-    throw err;
-  });
+  log.info("Page compilation completed.");
+}
+
+try {
+  await Promise.all([compileCSS(), compilePages()]);
+  log.info("Build process completed successfully.");
+} catch (err) {
+  log.error("Build process failed.");
+  throw err;
+}
