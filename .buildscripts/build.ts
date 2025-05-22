@@ -2,10 +2,7 @@ import { createStreaming } from "@dprint/formatter";
 import { copy, ensureDir, ensureFile, exists } from "fs";
 import { dirname, join } from "path";
 import vento from "vento";
-import {
-  REQUIRED_DIRECTORIES,
-  RESET_DIRECTORY_KEYS as REMOVE_DIRECTORY_KEYS,
-} from "./directories.config.ts";
+import { REMOVE_DIRECTORY_KEYS, REQUIRED_DIRECTORIES } from "./directories.config.ts";
 import { getPageData, navData } from "./pages.ts";
 import { processFiles } from "./utils/files.ts";
 import { PROJECT_ROOT } from "./utils/init.ts";
@@ -13,8 +10,8 @@ import * as log from "./utils/log.ts";
 import { transformCSS } from "./utils/postcss.ts";
 import { PromiseCollection } from "./utils/promises.ts";
 
-// Ensure any directories that should be deleted before compiling are in fact deleted
-async function resetDirectories() {
+// Remove directories that need to be deleted before compilation
+async function removeDirectories() {
   const removePromises = new PromiseCollection("consecutive");
 
   for (const key of REMOVE_DIRECTORY_KEYS) {
@@ -28,18 +25,17 @@ async function resetDirectories() {
   }
 
   await removePromises.execute();
-
-  log.debug("Barebones directory structure ensured.");
+  log.debug("Clean directory structure ensured.");
 }
 
-// Copy all non-css assets over
+// Copy static assets to the serve directory (except CSS)
 async function copyAssets() {
   try {
     // Copy all assets
     await copy(REQUIRED_DIRECTORIES.assets, REQUIRED_DIRECTORIES.servedAssets);
     log.info("Assets copied successfully.");
 
-    // Remove copied css directory
+    // Remove copied css directory - will be recompiled
     await Deno.remove(REQUIRED_DIRECTORIES.servedCss, { recursive: true });
     log.info("CSS files removed from assets - will be compiled and optimised.");
   } catch (err) {
@@ -48,7 +44,7 @@ async function copyAssets() {
   }
 }
 
-// Compile/process css
+// Compile and optimise CSS files
 async function compileCSS() {
   log.info("Preparing to compile CSS...");
 
@@ -87,10 +83,10 @@ async function compileCSS() {
   );
 
   log.info("CSS compilation completed.");
-
   logPromises.execute().then(() => log.info("CSS compilation logs saved."));
 }
 
+// Compile page templates to HTML
 async function compilePages() {
   log.info("Preparing to compile pages...");
   log.info("Obtaining markup formatting plugin...");
@@ -107,7 +103,6 @@ async function compilePages() {
     });
 
     log.info("Markup formatting plugin downloaded.");
-
     return formatter;
   });
 
@@ -165,7 +160,7 @@ async function compilePages() {
 }
 
 try {
-  await resetDirectories();
+  await removeDirectories();
   await copyAssets();
   await Promise.all([compileCSS(), compilePages()]);
   log.info("Build process completed successfully.");

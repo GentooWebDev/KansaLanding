@@ -5,8 +5,8 @@ export class PromiseCollection<T = void> {
     private readonly mode: "consecutive" | "parallel",
   ) {}
 
-  public add(cb: () => PromiseLike<T>) {
-    this.promises.push(cb);
+  public add(promiseCallback: () => PromiseLike<T>) {
+    this.promises.push(promiseCallback);
   }
 
   public async execute(): Promise<T[]> {

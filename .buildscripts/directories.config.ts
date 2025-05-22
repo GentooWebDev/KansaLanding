@@ -13,7 +13,8 @@ export const REQUIRED_DIRECTORIES = {
   bad_code: join(PROJECT_ROOT, "bad_code"),
 };
 
-export const RESET_DIRECTORY_KEYS = [
+// Directories that should be removed before each build
+export const REMOVE_DIRECTORY_KEYS = [
   "serve",
   "logs",
   "bad_code",
