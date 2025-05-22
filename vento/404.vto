@@ -1,0 +1,22 @@
+{{ layout "_template.vto" { ...it } }}
+  <div class="width-control">
+    <h1>Sorry, this page couldn't be found.</h1>
+    <p>
+      It may have been removed, had its name changed, or be temporarily unavailable. <br>
+      If you typed the address manually, please make sure it is correct.
+    </p>
+    <span style="font-weight: 800;font-size:0.8em;color:#d15447;">Not Found (404)</span>
+    <p>
+      You could try:
+      <ul>
+        <li><a href="/">Our homepage</a></li>
+        <li><a href="https://lighting.kansa.co.uk">Our lighting store</a></li>
+        <li><a href="https://stainedglass.kansa.co.uk">Our stained glass store</a></li>
+        <li><a href="/contact">Our contact page</a></li>
+      </ul>
+      <span data-needs-js hidden>
+        Or you can go back to the <a onclick="history.back()">previous page</a>.
+      </span>
+    </p>
+  </div>
+{{ /layout }}

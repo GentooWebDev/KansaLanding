@@ -23,6 +23,11 @@ export const pages: Page[] = [
     title: "Refunds Policy",
     filepath: "refunds.vto",
   },
+  {
+    title: "404 - Not Found",
+    filepath: "404.vto",
+    js: "needs-js",
+  },
 ];
 
 export const navData: { top: NavBar; bottom: NavBar } = {
